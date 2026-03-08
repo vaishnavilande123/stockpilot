@@ -11,6 +11,7 @@ class Store(models.Model):
   def __str__(self):
     return self.store_name
   
+  
 class Category(models.Model):
   name = models.CharField(max_length=100)
   store = models.ForeignKey(Store, on_delete = models.CASCADE)
@@ -23,8 +24,10 @@ class Product(models.Model):
   name = models.CharField(max_length=200)
   category = models.ForeignKey(Category, on_delete = models.CASCADE)
   store = models.ForeignKey(Store, on_delete = models.CASCADE)
+
   cost_price = models.DecimalField(max_digits = 10, decimal_places=2)
   selling_price = models.DecimalField(max_digits=10, decimal_places=2)
+
   barcode = models.CharField(max_length=100, blank=True, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
    
@@ -47,6 +50,7 @@ class ProductVariant(models.Model):
 class Inventory(models.Model):
   variant = models.OneToOneField(ProductVariant, on_delete=models.CASCADE)
   store = models.ForeignKey(Store, on_delete=models.CASCADE)
+
   quantity_available = models.IntegerField(default=0)
   minimun_stock_level = models.IntegerField(default=5)
   last_updated = models.DateTimeField(auto_now=True)
@@ -54,5 +58,80 @@ class Inventory(models.Model):
 
   def __str__(self):
     return f"{self.variant} - Stock: {self.quantity_available}"
+
+
+class Supplier(models.Model):
+  store = models.ForeignKey(Store, on_delete=models.CASCADE)
+  supplier_name = models.CharField(max_length=200)
+
+  phone = models.CharField(max_length=15)
+  email = models.EmailField(blank=True, null=True)
+  city = models.CharField(max_length=100)
+  address = models.TextField(blank=True, null=True)
+  created_at = models.DateTimeField(auto_now_add = True)
+
+  def __str__(self):
+    return self.supplier_name
   
+
+class Purchase(models.Model):
+
+  STATUS_CHOICES = [
+    ('Pending', 'Pending'),
+    ('Delivered', 'Delivered'),
+    ('Cancelled', 'Cancelled'),
+    ('Partially Delivered', 'Partially Delivered'),
+  ]  
+
+  store = models.ForeignKey(Store, on_delete=models.CASCADE)
+  supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+
+  order_date = models.DateField()
+  expected_delivery_date = models.DateField()
+  delivery_date = models.DateField(null=True, blank=True)
+
+  order_status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Pending')
+
+  total_cost = models.DecimalField(max_digits=15, decimal_places=2)
+
+  def __str__(self):
+    return f"Purchase{self.id} - {self.supplier.supplier_name}"
+
+
+class PurchaseItem(models.Model):
+  purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE)
+  variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+
+  ordered_quantity = models.IntegerField()
+  delivered_quantity = models.IntegerField(default=0)
+
+  unit_cost = models.DecimalField(max_digits=10, decimal_places = 2)
+
+  def __str__(self):
+    return f"{self.variant} - {self.ordered_quantity}"
+
+
+
+class Sale(models.Model):
+  store = models.ForeignKey(Store, on_delete=models.CASCADE)
+  sale_date = models.DateField()
+  total_amount = models.DecimalField(max_digits=15, decimal_places=2)
+
+  def __str__(self):
+    return f"Sale{self.id} - {self.sale_date}"
+  
+
+class SaleItem(models.Model):
+  sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
+  variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+
+  quantity = models.IntegerField()
+  selling_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+  def __str__(self):
+    return f"{self.variant} - {self.quantity}"
     
+
+
+
+
