@@ -58,6 +58,9 @@ class Inventory(models.Model):
 
   def __str__(self):
     return f"{self.variant} - Stock: {self.quantity_available}"
+  
+  def needs_reorder(self):
+    return self.quantity_available <= self.minimun_stock_level
 
 
 class Supplier(models.Model):
@@ -109,6 +112,17 @@ class PurchaseItem(models.Model):
 
   def __str__(self):
     return f"{self.variant} - {self.ordered_quantity}"
+  
+  def save(self, *args, **kwargs):
+    super().save(*args, **kwargs)
+
+    inventory, created = Inventory.objects.get_or_create(
+      variant = self.variant,
+      store = self.purchase.store
+    )
+
+    inventory.quantity_available += self.delivered_quantity
+    inventory.save()
 
 
 
@@ -130,6 +144,22 @@ class SaleItem(models.Model):
 
   def __str__(self):
     return f"{self.variant} - {self.quantity}"
+  
+  def save(self, *args, **kwargs):
+    super().save(*args, **kwargs)
+
+    try:
+      inventory = Inventory.objects.get(
+        variant=self.variant,
+        store=self.sale.store
+      )
+
+      inventory.quantity_available -= self.quantity
+      inventory.last_sale_date = self.sale.sale_date
+      inventory.save()
+
+    except Inventory.DoesNotExist:
+      pass  
     
 
 
