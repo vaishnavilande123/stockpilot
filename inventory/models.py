@@ -59,6 +59,7 @@ class Inventory(models.Model):
   def __str__(self):
     return f"{self.variant} - Stock: {self.quantity_available}"
   
+  @property
   def needs_reorder(self):
     return self.quantity_available <= self.minimun_stock_level
 
@@ -109,6 +110,8 @@ class PurchaseItem(models.Model):
   delivered_quantity = models.IntegerField(default=0)
 
   unit_cost = models.DecimalField(max_digits=10, decimal_places = 2)
+
+  discount_percent = models.FloatField(default=0)
 
   def __str__(self):
     return f"{self.variant} - {self.ordered_quantity}"
