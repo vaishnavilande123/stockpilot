@@ -46,6 +46,14 @@ class ProductVariant(models.Model):
   def __str__(self):
     return f"{self.product.name} - {self.size} - {self.color}"
   
+  class Meta:
+    constraints = [
+      models.UniqueConstraint(
+        fields=["product", "size", "color"],
+        name="unique_product_variant"
+      )
+    ]
+  
 
 class Inventory(models.Model):
   variant = models.OneToOneField(ProductVariant, on_delete=models.CASCADE)
