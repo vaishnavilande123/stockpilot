@@ -104,7 +104,8 @@ class Purchase(models.Model):
 
 class PurchaseItem(models.Model):
   purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE)
-  variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
+  variant = models.ForeignKey(ProductVariant, 
+  on_delete=models.CASCADE)
 
   ordered_quantity = models.IntegerField()
   delivered_quantity = models.IntegerField(default=0)
