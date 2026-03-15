@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sale Item</title>
+</head>
+<body>
+
+<h2>{% if object %}Update Sale Item{% else %}Add Sale Item{% endif %}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">Save Item</button>
+</form>
+
+<br>
+
+<a href="{% url 'sale_item_list' %}?sale_id={{ request.GET.sale_id }}">
+    Back
+</a>
+
+</body>
+</html>

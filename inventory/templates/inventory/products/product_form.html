@@ -6,11 +6,13 @@
   <title>Document</title>
 </head>
 <body>
-  <h2>Add Product</h2>
+  <h2>{% if object %}Update Product{% else %}Add Product{% endif %}</h2>
   <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">save product</button>
   </form>
+  
+<a href="{% url 'product_list' %}">Back to Products</a>
 </body>
 </html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Purchase Form</title>
+</head>
+<body>
+
+<h2>{% if object %}Update Purchase{% else %}Create Purchase{% endif %}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">Save Purchase</button>
+</form>
+
+<br>
+
+<a href="{% url 'purchase_list' %}">Back to Purchases</a>
+
+</body>
+</html>

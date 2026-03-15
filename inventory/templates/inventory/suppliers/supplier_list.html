@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Suppliers</title>
+</head>
+<body>
+
+<h2>Suppliers</h2>
+
+<a href="{% url 'supplier_add' %}">Add Supplier</a>
+
+<br><br>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Supplier Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>City</th>
+            <th>Store</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for supplier in suppliers %}
+
+        <tr>
+            <td>{{ supplier.id }}</td>
+            <td>{{ supplier.supplier_name }}</td>
+            <td>{{ supplier.phone }}</td>
+            <td>{{ supplier.email }}</td>
+            <td>{{ supplier.city }}</td>
+            <td>{{ supplier.store }}</td>
+
+            <td>
+                <a href="{% url 'supplier_update' supplier.id %}">Edit</a>
+                |
+                <a href="{% url 'supplier_delete' supplier.id %}">Delete</a>
+            </td>
+        </tr>
+
+    {% empty %}
+
+        <tr>
+            <td colspan="7">No suppliers available</td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+</body>
+</html>

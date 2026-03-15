@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Variants</title>
+</head>
+<body>
+
+<h2>Product Variants</h2>
+
+<a href="{% url 'product_variant_add' %}">Add Variant</a>
+
+<br><br>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Size</th>
+            <th>Color</th>
+            <th>SKU</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for variant in product_variants %}
+
+        <tr>
+            <td>{{ variant.id }}</td>
+            <td>{{ variant.product.name }}</td>
+            <td>{{ variant.size }}</td>
+            <td>{{ variant.color }}</td>
+            <td>{{ variant.sku }}</td>
+
+            <td>
+                <a href="{% url 'product_variant_update' variant.id %}">Edit</a>
+                |
+                <a href="{% url 'product_variant_delete' variant.id %}">Delete</a>
+            </td>
+        </tr>
+
+    {% empty %}
+
+        <tr>
+            <td colspan="6">No variants available</td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
+
+</body>
+</html>

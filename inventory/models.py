@@ -54,13 +54,23 @@ class ProductVariant(models.Model):
       )
     ]
   
+  def save(self, *args, **kwargs):
+    if not self.sku:
+      product_name = self.product.name[0:3].upper()
+      product_size = self.size.upper() 
+      product_color = self.color[0:3].upper()
+
+      self.sku = f"{product_name}-{product_size}-{product_color}"
+
+    super().save(*args, **kwargs)  
+    
 
 class Inventory(models.Model):
   variant = models.OneToOneField(ProductVariant, on_delete=models.CASCADE)
   store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
   quantity_available = models.IntegerField(default=0)
-  minimun_stock_level = models.IntegerField(default=5)
+  minimum_stock_level = models.IntegerField(default=5)
   last_updated = models.DateTimeField(auto_now=True)
   last_sale_date = models.DateTimeField(null=True, blank=True)
 

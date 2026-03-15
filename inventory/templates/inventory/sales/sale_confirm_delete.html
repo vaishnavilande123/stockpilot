@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Sale</title>
+</head>
+<body>
+
+<h2>Delete Sale</h2>
+
+<p>Are you sure you want to delete Sale #{{ object.id }}?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Confirm Delete</button>
+</form>
+
+<br>
+
+<a href="{% url 'sale_list' %}">Cancel</a>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Categories</title>
+</head>
+
+<body>
+
+<h2>Categories</h2>
+
+<a href="{% url 'category_add' %}">Add Category</a>
+
+<br><br>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Store</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for category in categories %}
+
+        <tr>
+            <td>{{ category.id }}</td>
+            <td>{{ category.name }}</td>
+            <td>{{ category.store }}</td>
+
+            <td>
+                <a href="{% url 'category_update' category.id %}">Edit</a>
+
+                |
+
+                <a href="{% url 'category_delete' category.id %}">Delete</a>
+            </td>
+        </tr>
+
+        {% empty %}
+
+        <tr>
+            <td colspan="4">No categories available</td>
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+</body>
+</html>

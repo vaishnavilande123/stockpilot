@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supplier Form</title>
+</head>
+<body>
+
+<h2>{% if object %}Update Supplier{% else %}Add Supplier{% endif %}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">Save Supplier</button>
+</form>
+
+<br>
+
+<a href="{% url 'supplier_list' %}">Back to Suppliers</a>
+
+</body>
+</html>

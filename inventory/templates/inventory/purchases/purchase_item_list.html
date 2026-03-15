@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Purchase Items</title>
+</head>
+<body>
+
+<h2>Purchase Items</h2>
+
+<a href="{% url 'purchase_item_add' %}?purchase_id={{ request.GET.purchase_id }}">Add Item</a>
+
+<br><br>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Purchase</th>
+            <th>Variant</th>
+            <th>Ordered</th>
+            <th>Delivered</th>
+            <th>Unit Cost</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for item in items %}
+
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.purchase.id }}</td>
+            <td>{{ item.variant }}</td>
+            <td>{{ item.ordered_quantity }}</td>
+            <td>{{ item.delivered_quantity }}</td>
+            <td>{{ item.unit_cost }}</td>
+
+            <td>
+                <a href="{% url 'purchase_item_update' item.id %}">Edit</a>
+                |
+                <a href="{% url 'purchase_item_delete' item.id %}">Delete</a>
+            </td>
+        </tr>
+
+    {% empty %}
+
+        <tr>
+            <td colspan="7">No purchase items</td>
+        </tr>
+
+    {% endfor %}
+    
+
+    </tbody>
+
+</table>
+
+</body>
+</html>

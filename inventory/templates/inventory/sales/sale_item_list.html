@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sale Items</title>
+</head>
+<body>
+
+<h2>Sale Items</h2>
+
+<a href="{% url 'sale_item_add' %}?sale_id={{ request.GET.sale_id }}">
+    Add Item
+</a>
+
+<br><br>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Sale</th>
+            <th>Variant</th>
+            <th>Quantity</th>
+            <th>Selling Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for item in items %}
+
+        <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.sale.id }}</td>
+            <td>{{ item.variant }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.selling_price }}</td>
+
+            <td>
+                <a href="{% url 'sale_item_update' item.id %}">Edit</a> |
+                <a href="{% url 'sale_item_delete' item.id %}">Delete</a>
+            </td>
+        </tr>
+
+    {% empty %}
+
+        <tr>
+            <td colspan="6">No items found</td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+<br>
+
+<a href="{% url 'sale_list' %}">Back to Sales</a>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Category Form</title>
+</head>
+<body>
+
+<h2>{% if object %}Update Category{% else %}Add Category{% endif %}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">Save Category</button>
+</form>
+
+<br>
+
+<a href="{% url 'category_list' %}">Back to Categories</a>
+
+</body>
+</html>
