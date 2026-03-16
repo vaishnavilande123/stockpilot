@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventory</title>
+</head>
+<body>
+
+<h2>Inventory Overview</h2>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Variant</th>
+            <th>Stock</th>
+            <th>Minimum Level</th>
+            <th>Status</th>
+            <th>Last Sale</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for stock in stocks %}
+
+        <tr>
+            <td>{{ stock.variant.product.name }}</td>
+            <td>{{ stock.variant }}</td>
+            <td>{{ stock.quantity_available }}</td>
+            <td>{{ stock.minimum_stock_level }}</td>
+
+            <td>
+                {% if stock.needs_reorder %}
+                    ⚠ Low Stock
+                {% else %}
+                    OK
+                {% endif %}
+            </td>
+
+            <td>{{ stock.last_sale_date }}</td>
+
+        </tr>
+
+    {% empty %}
+
+        <tr>
+            <td colspan="6">No inventory records</td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
+
+</body>
+</html>

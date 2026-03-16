@@ -6,6 +6,7 @@ from .views.category_views import CategoryListView, CategoryCreateView, Category
 from .views.product_variant_views import ProductVariantListView, ProductVariantCreateView, ProductVariantUpdateView, ProductVariantDeleteView
 from .views.purchase_views import PurchaseItemCreateView, PurchaseItemDeleteView, PurchaseItemListView, PurchaseItemUpdateView, PurchaseListView, PurchaseCreateView, PurchaseUpdateView, PurchaseDeleteView
 from .views.sale_views import SaleListView, SaleCreateView, SaleUpdateView, SaleDeleteView, SaleItemListView, SaleItemCreateView, SaleItemUpdateView, SaleItemDeleteView
+from .views.inventory_views import InventoryListView
 
 
 
@@ -49,4 +50,6 @@ urlpatterns = [
   path("sale-items/add/", SaleItemCreateView.as_view(), name="sale_item_add"),
   path("sale-items/<int:pk>/update/", SaleItemUpdateView.as_view(), name="sale_item_update"),
   path("sale-items/<int:pk>/delete/", SaleItemDeleteView.as_view(), name="sale_item_delete"),
+
+  path("inventories/", InventoryListView.as_view(), name="inventory_list"),
 ]

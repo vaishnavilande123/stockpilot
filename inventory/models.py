@@ -12,6 +12,7 @@ class Store(models.Model):
     return self.store_name
   
   
+
 class Category(models.Model):
   name = models.CharField(max_length=100)
   store = models.ForeignKey(Store, on_delete = models.CASCADE)
@@ -19,6 +20,7 @@ class Category(models.Model):
   def __str__(self):
     return self.name
   
+
 
 class Product(models.Model):
   name = models.CharField(max_length=200)
@@ -33,6 +35,7 @@ class Product(models.Model):
    
   def __str__(self):
     return self.name
+
 
 
 class ProductVariant(models.Model):
@@ -65,6 +68,7 @@ class ProductVariant(models.Model):
     super().save(*args, **kwargs)  
     
 
+
 class Inventory(models.Model):
   variant = models.OneToOneField(ProductVariant, on_delete=models.CASCADE)
   store = models.ForeignKey(Store, on_delete=models.CASCADE)
@@ -79,7 +83,8 @@ class Inventory(models.Model):
   
   @property
   def needs_reorder(self):
-    return self.quantity_available <= self.minimun_stock_level
+    return self.quantity_available <= self.minimum_stock_level
+
 
 
 class Supplier(models.Model):
@@ -95,6 +100,7 @@ class Supplier(models.Model):
   def __str__(self):
     return self.supplier_name
   
+
 
 class Purchase(models.Model):
 
@@ -120,6 +126,7 @@ class Purchase(models.Model):
     return f"Purchase{self.id} - {self.supplier.supplier_name}"
 
 
+
 class PurchaseItem(models.Model):
   purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE)
   variant = models.ForeignKey(ProductVariant, 
@@ -136,6 +143,13 @@ class PurchaseItem(models.Model):
     return f"{self.variant} - {self.ordered_quantity}"
   
   def save(self, *args, **kwargs):
+
+    if self.pk:
+      old_item = PurchaseItem.objects.get(pk = self.pk)
+      old_delivered = old_item.delivered_quantity
+    else:
+      old_delivered = 0 
+
     super().save(*args, **kwargs)
 
     inventory, created = Inventory.objects.get_or_create(
@@ -143,7 +157,9 @@ class PurchaseItem(models.Model):
       store = self.purchase.store
     )
 
-    inventory.quantity_available += self.delivered_quantity
+    difference = self.delivered_quantity - old_delivered
+
+    inventory.quantity_available += difference
     inventory.save()
 
 
@@ -157,6 +173,7 @@ class Sale(models.Model):
     return f"Sale{self.id} - {self.sale_date}"
   
 
+
 class SaleItem(models.Model):
   sale = models.ForeignKey(Sale, on_delete=models.CASCADE)
   variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
@@ -168,20 +185,32 @@ class SaleItem(models.Model):
     return f"{self.variant} - {self.quantity}"
   
   def save(self, *args, **kwargs):
-    super().save(*args, **kwargs)
+
+    if self.pk:
+      old_item = SaleItem.objects.get(pk = self.pk)
+      old_delivered = old_item.quantity
+    else:
+      old_delivered = 0
+
+    difference = self.quantity - old_delivered
 
     try:
       inventory = Inventory.objects.get(
         variant=self.variant,
         store=self.sale.store
       )
+      
+      if inventory.quantity_available < difference:
+        raise ValueError("Not enough stock available")
+      
+      super().save(*args, **kwargs)
 
-      inventory.quantity_available -= self.quantity
+      inventory.quantity_available -= difference
       inventory.last_sale_date = self.sale.sale_date
       inventory.save()
 
     except Inventory.DoesNotExist:
-      pass  
+      raise ValueError("Product not available in inventory")  
     
 
 

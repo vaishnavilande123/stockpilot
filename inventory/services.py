@@ -1,11 +1,26 @@
 from .models import Inventory, Purchase, PurchaseItem, SaleItem, Product, Supplier
 from django.db.models import F, Q, Avg, Count, Sum
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models.functions import TruncWeek
 
+#---------------------------Inventory analytics-----------------------------
 def get_low_stock_items():
   return Inventory.objects.filter(
     quantity_available__lte=F("minimum_stock_level")
-  )
+  ).select_related("variant", "variant__product")
 
+def get_out_of_stock_items():
+    return Inventory.objects.filter(quantity_available=0)
+
+def get_dead_stock(days=30):
+    threshold = timezone.now().date() - timedelta(days=days)
+
+    return Inventory.objects.filter(
+    Q(last_sale_date__lt=threshold) | Q(last_sale_date__isnull=True)
+    )
+
+#--------------------------Sales analytics-----------------------
 def get_fast_moving_products(limit=5):
   return(
     SaleItem.objects
@@ -14,29 +29,67 @@ def get_fast_moving_products(limit=5):
     .order_by('-total_sold')[:limit]
   )
 
+def get_slow_moving_products(limit=5):
+    return (
+        SaleItem.objects
+        .values('variant__product', 'variant__product__name')
+        .annotate(total_sold=Sum('quantity'))
+        .order_by('total_sold')[:limit]
+    )
+
+#-------------------Profit analytics-----------------------
 def get_most_profitable_products(limit=5):
-  products = Product.objects.all()
 
-  product_profits = []
+    return (
+        SaleItem.objects
+        .values('variant__product', 'variant__product__name')
+        .annotate(
+            total_profit=Sum(
+                (F("selling_price") - F("variant__product__cost_price")) * F("quantity")
+            )
+        )
+        .order_by('-total_profit')[:limit]
+    )
 
-  for product in products:
-    profit = product.selling_price - product.cost_price
-    product_profits.append({
-      "product" : product.name,
-      "profit_per_unit": profit
-    })
+#-------------------Demand analytics-----------------------
+def get_product_weekly_demand(product_id, weeks=8):
 
-  product_profits.sort(key=lambda x: x["profit_per_unit"], reverse=True)
+    start_date = timezone.now().date() - timedelta(weeks=weeks)
 
-  return product_profits[:limit]  
+    data = (
+        SaleItem.objects
+        .filter(
+            variant__product_id=product_id,
+            sale__sale_date__gte=start_date
+        )
+        .annotate(week=TruncWeek("sale__sale_date"))
+        .values("week")
+        .annotate(total_sold=Sum("quantity"))
+        .order_by("week")
+    )
+
+    return data
+
+def get_average_weekly_demand(product_id, weeks=8):
+
+    weekly_data = get_product_weekly_demand(product_id, weeks)
+
+    total_units = 0
+    week_count = 0
+
+    for row in weekly_data:
+        total_units += row["total_sold"]
+        week_count += 1
+
+    if week_count == 0:
+        return 0
+
+    avg_demand = total_units / week_count
+
+    return round(avg_demand, 2)
 
 
-  #optimized one check later on
-  # Product.objects.annotate(
-  #   profit=F("selling_price") - F("cost_price")
-  # ).order_by("-profit")[:limit]
-
-
+#-------------------Supplier analytics-----------------------
 def get_supplier_reliability():
   supplier = Purchase.objects.values('supplier', 'supplier__supplier_name').annotate(
     total_orders=Count('id'),

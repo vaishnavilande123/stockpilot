@@ -1,3 +1,4 @@
+from django import forms
 from django.forms import ModelForm
 from ..models import Purchase
 
@@ -14,6 +15,12 @@ class PurchaseForm(ModelForm):
             'order_status',
             'total_cost'
         ]
+
+        widgets = {
+            "order_date": forms.DateInput(attrs={"type": "date"}),
+            "expected_delivery_date": forms.DateInput(attrs={"type": "date"}),
+            "delivery_date": forms.DateInput(attrs={"type": "date"}),
+        }
 
 from ..models import PurchaseItem
 

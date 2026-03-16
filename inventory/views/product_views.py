@@ -19,9 +19,9 @@ class ProductUpdateView(UpdateView):
   model = Product
   form_class = ProductForm
   template_name = "inventory/products/product_form.html"
-  success_url = reverse_lazy("product-list")  
+  success_url = reverse_lazy("product_list")  
 
 class ProductDeleteView(DeleteView):
   model = Product
   template_name = "inventory/products/product_confirm_delete.html"
-  success_url = reverse_lazy("product-list")  
+  success_url = reverse_lazy("product_list")  
