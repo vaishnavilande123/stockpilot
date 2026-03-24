@@ -1,0 +1,76 @@
+{% extends "inventory/base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+
+    <div class="col-md-5">
+
+        <div class="card form-card p-2">
+
+            <h3 class="text-center mb-3" style="color:#4c1d95;">
+                🏬 Create Store
+            </h3>
+
+            <p class="text-center text-muted mb-4">
+                Add your new store to start managing inventory
+            </p>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            
+            <!-- FORM -->
+            <form method="POST">
+                {% csrf_token %}
+
+                <!-- Store Name -->
+                <div class="mb-3">
+                    <label class="form-label">Store Name</label>
+                    {{ form.store_name }}
+
+                    {% if form.store_name.errors %}
+                        <div class="text-danger small">
+                            {{ form.store_name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Location -->
+                <div class="mb-3">
+                    <label class="form-label">Location</label>
+                    {{ form.location }}
+
+                    {% if form.location.errors %}
+                        <div class="text-danger small">
+                            {{ form.location.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary w-100">
+                    Create Store
+                </button>
+
+            </form>
+
+
+            <!-- Back -->
+            <hr class="my-4">
+
+            <p class="text-center mb-0">
+                <a href="{% url 'select_store' %}" style="color:#7c3aed;">
+                    ← Back to Store Selection
+                </a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

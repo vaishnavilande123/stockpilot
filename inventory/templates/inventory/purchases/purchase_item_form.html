@@ -1,23 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Purchase Item</title>
-</head>
-<body>
-
-<h2>{% if object %}Update Purchase Item{% else %}Add Purchase Item{% endif %}</h2>
-
-<form method="POST">
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button type="submit">Save Item</button>
-</form>
-
-<br>
-
-<a href="{% url 'purchase_item_list' %}">Back</a>
-
-</body>
-</html>
+{% extends "inventory/base.html" %}
+{% block title %}{% if object %}Update{% else %}Add{% endif %} Purchase Item{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card form-card">
+            <div class="card-body">
+                <h4>{% if object %}✏️ Update Purchase Item{% else %}➕ Add Purchase Item{% endif %}</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'purchase_item_list' %}" class="btn btn-outline-secondary">← Back</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

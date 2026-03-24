@@ -1,62 +1,51 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sale Items</title>
-</head>
-<body>
+{% extends "inventory/base.html" %}
+{% block title %}Sale Items{% endblock %}
+{% block content %}
 
-<h2>Sale Items</h2>
+<div class="list-header">
+    <h2>Sale Items <span style="font-size:1rem; color:#7c3aed;">#{{ request.GET.sale_id }}</span></h2>
+    <a href="{% url 'sale_item_add' %}?sale_id={{ request.GET.sale_id }}" class="btn btn-primary">+ Add Item</a>
+</div>
 
-<a href="{% url 'sale_item_add' %}?sale_id={{ request.GET.sale_id }}">
-    Add Item
-</a>
+<div class="list-card">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Variant</th>
+                <th>Quantity</th>
+                <th>Selling Price</th>
+                <th>Line Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td class="fw-medium">{{ item.variant.product.name }} <span class="text-muted">({{ item.variant.size }} - {{ item.variant.color }})</span></td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.selling_price }}</td>
+                <td class="fw-bold text-success">₹{% widthratio item.selling_price 1 item.quantity %}</td>
+                <td>
+                    <a href="{% url 'sale_item_update' item.id %}" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                    <a href="{% url 'sale_item_delete' item.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">
+                    <div class="empty-state">
+                        <div class="empty-icon"></div>
+                        <p>No items in this sale yet.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<br><br>
+<div class="mt-3">
+    <a href="{% url 'sale_list' %}" class="btn btn-outline-secondary">← Back to Sales</a>
+</div>
 
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Sale</th>
-            <th>Variant</th>
-            <th>Quantity</th>
-            <th>Selling Price</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-    {% for item in items %}
-
-        <tr>
-            <td>{{ item.id }}</td>
-            <td>{{ item.sale.id }}</td>
-            <td>{{ item.variant }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.selling_price }}</td>
-
-            <td>
-                <a href="{% url 'sale_item_update' item.id %}">Edit</a> |
-                <a href="{% url 'sale_item_delete' item.id %}">Delete</a>
-            </td>
-        </tr>
-
-    {% empty %}
-
-        <tr>
-            <td colspan="6">No items found</td>
-        </tr>
-
-    {% endfor %}
-
-    </tbody>
-
-</table>
-
-<br>
-
-<a href="{% url 'sale_list' %}">Back to Sales</a>
-
-</body>
-</html>
+{% endblock %}

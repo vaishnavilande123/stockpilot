@@ -1,23 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Variant Form</title>
-</head>
-<body>
-
-<h2>{% if object %}Update Variant{% else %}Add Variant{% endif %}</h2>
-
-<form method="POST">
-    {% csrf_token %}
-
-    {{ form.as_p }}
-
-    <button type="submit">Save Variant</button>
-</form>
-
-<br>
-
-<a href="{% url 'product_variant_list' %}">Back to Variants</a>
-
-</body>
-</html>
+{% extends "inventory/base.html" %}
+{% block title %}{% if object %}Update{% else %}Add{% endif %} Variant{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card form-card">
+            <div class="card-body">
+                <h4>{% if object %}✏️ Update Variant{% else %}➕ Add Variant{% endif %}</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'product_variant_list' %}" class="btn btn-outline-secondary">← Back</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Variant</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

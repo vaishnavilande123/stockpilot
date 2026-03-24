@@ -1,0 +1,25 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="text-center bg-white p-5 shadow-sm" style="max-width: 500px; width: 100%; border-radius: 16px;">
+        <div class="mb-4 text-danger d-flex justify-content-center">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+        </div>
+        <h3 class="fw-bold mb-3 text-dark">System Error (500)</h3>
+        <p class="text-muted mb-4" style="font-size: 1.05rem;">
+            We are experiencing some technical difficulties in the system. 
+            Please try again later or contact your administrator.
+        </p>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 8px; font-weight: 600;">
+            ← Return Home
+        </a>
+    </div>
+</div>
+{% endblock %}

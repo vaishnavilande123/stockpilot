@@ -1,60 +1,56 @@
+{% extends "inventory/base.html" %}
+{% block title %}Purchases{% endblock %}
+{% block content %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Purchases</title>
-</head>
-<body>
+<div class="list-header">
+    <h2>Purchases</h2>
+    <a href="{% url 'purchase_add' %}" class="btn btn-primary">+ Create Purchase</a>
+</div>
 
-<h2>Purchases</h2>
+<div class="list-card">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Supplier</th>
+                <th>Order Date</th>
+                <th>Status</th>
+                <th>Total Cost</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for purchase in purchases %}
+            <tr>
+                <td class="text-muted">{{ purchase.id }}</td>
+                <td class="fw-medium">{{ purchase.supplier.supplier_name }}</td>
+                <td>{{ purchase.order_date|date:"d M Y" }}</td>
+                <td>
+                    <span class="badge rounded-pill px-3 py-2
+                        {% if purchase.order_status == 'Delivered' %}bg-success
+                        {% elif purchase.order_status == 'Pending' %}bg-warning text-dark
+                        {% else %}bg-danger{% endif %}">
+                        {{ purchase.order_status }}
+                    </span>
+                </td>
+                <td class="fw-medium">₹{{ purchase.total_cost }}</td>
+                <td>
+                    <a href="{% url 'purchase_update' purchase.id %}" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                    <a href="{% url 'purchase_item_list' %}?purchase_id={{ purchase.id }}" class="btn btn-sm btn-outline-secondary">Items</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-icon"></div>
+                        <p>No purchases found. Create your first purchase!</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<a href="{% url 'purchase_add' %}">Create Purchase</a>
-
-<br><br>
-
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Supplier</th>
-            <th>Order Date</th>
-            <th>Status</th>
-            <th>Total Cost</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-    {% for purchase in purchases %}
-
-        <tr>
-            <td>{{ purchase.id }}</td>
-            <td>{{ purchase.supplier }}</td>
-            <td>{{ purchase.order_date }}</td>
-            <td>{{ purchase.order_status }}</td>
-            <td>{{ purchase.total_cost }}</td>
-
-            <td>
-                <a href="{% url 'purchase_update' purchase.id %}">Edit</a>
-                |
-                <a href="{% url 'purchase_delete' purchase.id %}">Delete</a>
-                
-                <a href="{% url 'purchase_item_list' %}?purchase_id={{ purchase.id }}">View Items</a>
-            </td>
-        </tr>
-
-    {% empty %}
-
-        <tr>
-            <td colspan="6">No purchases found</td>
-        </tr>
-
-    {% endfor %}
-
-    </tbody>
-
-</table>
-
-</body>
-</html>
+{% endblock %}

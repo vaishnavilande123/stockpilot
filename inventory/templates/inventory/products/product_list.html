@@ -1,52 +1,60 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Products</title>
-</head>
-<body>
+{% extends "inventory/base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
 
-<h1>Product List</h1>
+<div class="list-header">
+    <h2>Products</h2>
+    <a href="{% url 'product_add' %}" class="btn btn-primary">+ Add Product</a>
+</div>
 
-<a href="{% url 'product_add' %}">+ Add Product</a>
+<div class="list-card">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Cost Price</th>
+                <th>Marked Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" width="72" height="72" style="border-radius:10px; object-fit:cover; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">
+                    {% else %}
+                    <div style="width:72px; height:72px; border-radius:10px; background:#f1f5f9; display:flex; align-items:center; justify-content:center;">
+                        <span class="text-muted" style="font-size:1.8rem;">—</span>
+                    </div>
+                    {% endif %}
+                </td>
+                <td class="fw-medium">{{ product.name }}</td>
+                <td>{{ product.category.name }}</td>
+                <td>₹{{ product.cost_price }}</td>
+                <td>₹{{ product.marked_price }}</td>
+                <td>
+                    <a href="{% url 'product_update' product.id %}" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                    <a href="{% url 'product_delete' product.id %}" class="btn btn-sm btn-outline-danger me-1">Delete</a>
+                    <a href="{% url 'product_variant_add' %}?product_id={{ product.id }}" class="btn btn-sm btn-outline-success me-1">+ Variant</a>
+                    <a href="{% url 'product_variant_list' %}?product_id={{ product.id }}" class="btn btn-sm btn-outline-secondary me-1">Variants</a>
+                    <a href="{% url 'product_suppliers' product.id %}" class="btn btn-sm btn-outline-info">Dealers</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-icon"></div>
+                        <p>No products yet. Add your first product!</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<table border="1">
-    <tr>
-        <th>Name</th>
-        <th>Category</th>
-        <th>Cost Price</th>
-        <th>Selling Price</th>
-        <th>Edit</th>
-        <th>Delete</th>
-        <th>Add Variant</th>
-    </tr>
-
-    {% for product in products %}
-    <tr>
-        <td>{{ product.name }}</td>
-        <td>{{ product.category }}</td>
-        <td>{{ product.cost_price }}</td>
-        <td>{{ product.selling_price }}</td>
-
-        <td>
-            <a href="{% url 'product_update' product.id %}">Edit</a>
-        </td>
-
-        <td>
-            <a href="{% url 'product_delete' product.id %}">Delete</a>
-        </td>
-
-        <td>
-            <a href="{% url 'product_variant_add' %}?product_id={{ product.id }}">Add Variant</a>
-        </td>
-    </tr>
-
-    {% empty %}
-    <tr>
-        <td colspan="6">No Products Available</td>
-    </tr>
-    {% endfor %}
-
-</table>
-
-</body>
-</html>
+{% endblock %}

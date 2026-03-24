@@ -1,22 +1,18 @@
 from django import forms
 from django.forms import ModelForm
 from ..models import Sale
-
+from ..models import SaleItem
 
 class SaleForm(ModelForm):
     class Meta:
         model = Sale
         fields = [
-            "store",
             "sale_date",
-            "total_amount"
         ]
 
         widgets = {
             "sale_date": forms.DateInput(attrs={"type": "date"})
         }
-
-from ..models import SaleItem
 
 
 class SaleItemForm(ModelForm):

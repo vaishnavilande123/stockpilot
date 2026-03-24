@@ -1,0 +1,54 @@
+{% extends "inventory/base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+
+    <div class="col-md-4">
+
+        <div class="card shadow-lg p-4">
+
+            <!-- Title -->
+            <h3 class="text-center mb-3" style="color:#4c1d95;">
+                Welcome Back to StockPilot
+            </h3>
+
+            <p class="text-center text-muted mb-4">
+                Login to your StockPilot account
+            </p>
+
+            <!-- FORM -->
+            <form method="POST" autocomplete="off">
+                {% csrf_token %}
+                <!-- GLOBAL ERROR -->
+               {% if form.errors %}
+                <div class="alert alert-danger">
+                Invalid username or password
+                </div>
+               {% endif %}
+
+                <!-- Username -->
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Enter username" autocomplete="off" required>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter password" autocomplete="new-password" required>
+                </div>
+
+                <!-- Button -->
+                <button type="submit" class="btn btn-primary w-100">
+                    Login
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

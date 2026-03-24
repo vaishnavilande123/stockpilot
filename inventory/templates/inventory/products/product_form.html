@@ -1,18 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <h2>{% if object %}Update Product{% else %}Add Product{% endif %}</h2>
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">save product</button>
-  </form>
-  
-<a href="{% url 'product_list' %}">Back to Products</a>
-</body>
-</html>
+{% extends "inventory/base.html" %}
+{% block title %}{% if object %}Update{% else %}Add{% endif %} Product{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card form-card">
+            <div class="card-body">
+                <h4>{% if object %}✏️ Update Product{% else %}➕ Add Product{% endif %}</h4>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">← Back</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

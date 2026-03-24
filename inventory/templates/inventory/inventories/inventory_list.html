@@ -1,56 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Inventory</title>
-</head>
-<body>
+{% extends "inventory/base.html" %}
+{% block title %}Inventory Overview{% endblock %}
+{% block content %}
 
-<h2>Inventory Overview</h2>
+<div class="list-header">
+    <h2>Inventory Overview</h2>
+</div>
 
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Variant</th>
-            <th>Stock</th>
-            <th>Minimum Level</th>
-            <th>Status</th>
-            <th>Last Sale</th>
-        </tr>
-    </thead>
+<div class="list-card">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Variant</th>
+                <th>Stock</th>
+                <th>Min Level</th>
+                <th>Status</th>
+                <th>Last Sale</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in stocks %}
+            <tr>
+                <td class="fw-medium">{{ stock.variant.product.name }}</td>
+                <td>{{ stock.variant.size }} — {{ stock.variant.color }}</td>
+                <td><strong>{{ stock.quantity_available }}</strong></td>
+                <td>{{ stock.minimum_stock_level }}</td>
+                <td>
+                    {% if stock.quantity_available == 0 %}
+                        <span class="badge rounded-pill bg-danger px-3 py-2">Out of Stock</span>
+                    {% elif stock.needs_reorder %}
+                        <span class="badge rounded-pill bg-warning text-dark px-3 py-2">Low Stock</span>
+                    {% else %}
+                        <span class="badge rounded-pill bg-success px-3 py-2">In Stock</span>
+                    {% endif %}
+                </td>
+                <td class="text-muted">
+                    {% if stock.last_sale_date %}{{ stock.last_sale_date|date:"d M Y" }}{% else %}—{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <div class="empty-icon"></div>
+                        <p>No inventory records found.</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-    <tbody>
-
-    {% for stock in stocks %}
-
-        <tr>
-            <td>{{ stock.variant.product.name }}</td>
-            <td>{{ stock.variant }}</td>
-            <td>{{ stock.quantity_available }}</td>
-            <td>{{ stock.minimum_stock_level }}</td>
-
-            <td>
-                {% if stock.needs_reorder %}
-                    ⚠ Low Stock
-                {% else %}
-                    OK
-                {% endif %}
-            </td>
-
-            <td>{{ stock.last_sale_date }}</td>
-
-        </tr>
-
-    {% empty %}
-
-        <tr>
-            <td colspan="6">No inventory records</td>
-        </tr>
-
-    {% endfor %}
-
-    </tbody>
-</table>
-
-</body>
-</html>
+{% endblock %}

@@ -1,56 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Categories</title>
-</head>
+{% extends "inventory/base.html" %}
+{% block title %}Categories{% endblock %}
+{% block content %}
 
-<body>
+<div class="list-header">
+    <h2>Categories</h2>
+    <a href="{% url 'category_add' %}" class="btn btn-primary">+ Add Category</a>
+</div>
 
-<h2>Categories</h2>
+<div class="list-card">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Store</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td class="fw-medium">{{ category.name }}</td>
+                <td>{{ category.store }}</td>
+                <td>
+                    <a href="{% url 'category_update' category.id %}" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                    <a href="{% url 'category_delete' category.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">
+                    <div class="empty-state">
+                        <div class="empty-icon"></div>
+                        <p>No categories yet. Add your first one!</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<a href="{% url 'category_add' %}">Add Category</a>
-
-<br><br>
-
-<table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Store</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        {% for category in categories %}
-
-        <tr>
-            <td>{{ category.id }}</td>
-            <td>{{ category.name }}</td>
-            <td>{{ category.store }}</td>
-
-            <td>
-                <a href="{% url 'category_update' category.id %}">Edit</a>
-
-                |
-
-                <a href="{% url 'category_delete' category.id %}">Delete</a>
-            </td>
-        </tr>
-
-        {% empty %}
-
-        <tr>
-            <td colspan="4">No categories available</td>
-        </tr>
-
-        {% endfor %}
-
-    </tbody>
-
-</table>
-
-</body>
-</html>
+{% endblock %}

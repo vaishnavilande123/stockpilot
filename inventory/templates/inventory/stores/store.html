@@ -1,0 +1,57 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Select Store{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+
+        <div class="card form-card">
+            <div class="card-body">
+
+                <h4 style="border-color:#ede9fe;">Select a Store</h4>
+                <p class="text-muted mb-4" style="font-size:0.9rem;">Choose a store to manage, or create a new one.</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    {% for store in stores %}
+                    <div class="store-option">
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="radio" name="store_id" id="store_{{ store.id }}" value="{{ store.id }}" required>
+                            <label for="store_{{ store.id }}">
+                                <span class="store-location">{{ store.location }}</span>
+                            </label>
+                        </div>
+                        <a href="{% url 'store_delete' store.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <div class="empty-icon"></div>
+                        <p>No stores yet. Create your first store!</p>
+                    </div>
+                    {% endfor %}
+
+                    {% if stores %}
+                    <button type="submit" class="btn btn-primary w-100 mt-3">
+                        Go to Selected Store →
+                    </button>
+                    {% endif %}
+
+                </form>
+
+                <hr class="my-4" style="border-color:#ede9fe;">
+                <div class="text-center">
+                    <a href="{% url 'store_add' %}" class="btn btn-outline-primary">
+                        + Create New Store
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

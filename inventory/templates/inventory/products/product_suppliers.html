@@ -1,0 +1,202 @@
+{% extends "inventory/base.html" %}
+{% block title %}Dealers — {{ product.name }}{% endblock %}
+
+{% block content %}
+
+<style>
+    .dealer-card {
+        border: 2px solid #ede9fe;
+        border-radius: 18px;
+        background: white;
+        padding: 24px;
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        height: 100%;
+        position: relative;
+    }
+
+    .dealer-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 28px rgba(124, 58, 237, 0.12);
+        border-color: #7c3aed;
+    }
+
+    .best-badge {
+        position: absolute;
+        top: -12px;
+        right: 20px;
+        background: linear-gradient(90deg, #059669, #10b981);
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 4px 14px;
+        border-radius: 50px;
+        letter-spacing: 0.5px;
+    }
+
+    .supplier-name {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1e1b4b;
+        margin-bottom: 18px;
+    }
+
+    .score-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 800;
+        margin: 0 auto 6px;
+        color: white;
+    }
+
+    .score-label {
+        font-size: 0.72rem;
+        color: #6b7280;
+        text-align: center;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .metric-bar-wrap {
+        margin-top: 18px;
+    }
+
+    .metric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.83rem;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .metric-bar-bg {
+        height: 6px;
+        background: #ede9fe;
+        border-radius: 10px;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+
+    .metric-bar-fill {
+        height: 100%;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #7c3aed, #a78bfa);
+    }
+
+    .no-dealers {
+        text-align: center;
+        padding: 60px 20px;
+        color: #9ca3af;
+    }
+</style>
+
+<!-- HEADER -->
+<div class="list-header mb-4">
+    <div>
+        <h2>🤝 Dealers</h2>
+        <p class="text-muted mb-0" style="font-size:0.88rem;">Supplier intelligence for <strong>{{ product.name }}</strong></p>
+    </div>
+    <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">← Back to Products</a>
+</div>
+
+{% if suppliers %}
+
+<!-- RECOMMENDED BANNER -->
+{% if recommended_supplier %}
+<div class="alert d-flex align-items-center gap-3 mb-4"
+     style="background:#d1fae5; border:none; border-radius:14px; padding:16px 22px;">
+    <span style="font-size:1.8rem;">🏆</span>
+    <div>
+        <strong style="color:#065f46;">Recommended Dealer:</strong>
+        <span style="color:#047857; font-size:1rem; font-weight:600; margin-left:6px;">
+            {{ recommended_supplier.supplier_name }}
+        </span>
+        <span class="ms-2 text-muted" style="font-size:0.82rem;">
+            Reliability Score: <strong>{{ recommended_supplier.reliability_score }}</strong>/100
+        </span>
+    </div>
+</div>
+{% endif %}
+
+<!-- DEALER CARDS -->
+<div class="row g-4">
+    {% for s in suppliers %}
+    <div class="col-md-4">
+        <div class="dealer-card">
+
+            {% if recommended_supplier and s.supplier_id == recommended_supplier.supplier_id %}
+            <div class="best-badge">✓ Best Choice</div>
+            {% endif %}
+
+            <div class="supplier-name">{{ s.supplier_name }}</div>
+
+            <!-- SCORE CIRCLES -->
+            <div class="row g-2 text-center mb-2">
+                <div class="col-4">
+                    <div class="score-circle" style="background: linear-gradient(135deg,#7c3aed,#6d28d9);">
+                        {{ s.reliability_score|floatformat:0 }}
+                    </div>
+                    <div class="score-label">Reliability</div>
+                </div>
+                <div class="col-4">
+                    <div class="score-circle" style="background: linear-gradient(135deg,#0ea5e9,#0284c7);">
+                        {{ s.on_time_rate|floatformat:0 }}%
+                    </div>
+                    <div class="score-label">On Time</div>
+                </div>
+                <div class="col-4">
+                    <div class="score-circle" style="background: linear-gradient(135deg,#10b981,#059669);">
+                        {{ s.delivery_accuracy|floatformat:0 }}%
+                    </div>
+                    <div class="score-label">Accuracy</div>
+                </div>
+            </div>
+
+            <!-- METRIC BARS -->
+            <div class="metric-bar-wrap">
+                <div class="metric-row">
+                    <span>Delivery Success</span>
+                    <span class="fw-bold">{{ s.delivery_success }}%</span>
+                </div>
+                <div class="metric-bar-bg">
+                    <div class="metric-bar-fill" style="width: {{ s.delivery_success }}%;"></div>
+                </div>
+
+                <div class="metric-row">
+                    <span>Avg Discount</span>
+                    <span class="fw-bold">{{ s.avg_discount }}%</span>
+                </div>
+                <div class="metric-bar-bg">
+                    <div class="metric-bar-fill" style="width: {{ s.avg_discount }}%; background: linear-gradient(90deg,#f59e0b,#fbbf24);"></div>
+                </div>
+
+                <div class="metric-row">
+                    <span>Cancellation Rate</span>
+                    <span class="fw-bold" style="color:#ef4444;">{{ s.cancellation_rate }}%</span>
+                </div>
+                <div class="metric-bar-bg" style="background:#fee2e2;">
+                    <div class="metric-bar-fill" style="width: {{ s.cancellation_rate }}%; background: linear-gradient(90deg,#ef4444,#f87171);"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="list-card">
+    <div class="no-dealers">
+        <div style="font-size:3rem; margin-bottom:12px;">🔍</div>
+        <p>No supplier data found for <strong>{{ product.name }}</strong>. <br>Make sure you have purchases recorded for this product.</p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

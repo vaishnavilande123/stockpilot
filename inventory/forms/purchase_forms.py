@@ -1,19 +1,17 @@
 from django import forms
 from django.forms import ModelForm
 from ..models import Purchase
-
+from ..models import PurchaseItem
 
 class PurchaseForm(ModelForm):
     class Meta:
         model = Purchase
         fields = [
-            'store',
             'supplier',
             'order_date',
             'expected_delivery_date',
             'delivery_date',
             'order_status',
-            'total_cost'
         ]
 
         widgets = {
@@ -21,8 +19,6 @@ class PurchaseForm(ModelForm):
             "expected_delivery_date": forms.DateInput(attrs={"type": "date"}),
             "delivery_date": forms.DateInput(attrs={"type": "date"}),
         }
-
-from ..models import PurchaseItem
 
 
 class PurchaseItemForm(ModelForm):

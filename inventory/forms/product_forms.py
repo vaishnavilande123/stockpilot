@@ -4,10 +4,5 @@ from ..models import Product, ProductVariant
 class ProductForm(ModelForm):
   class Meta:
     model = Product
-    exclude = ["created_at"]
+    exclude = ["store","created_at"]
 
-
-class ProductVariantForm(ModelForm):
-  class Meta:
-    model = ProductVariant
-    fields = "__all__"

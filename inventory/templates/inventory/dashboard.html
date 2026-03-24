@@ -1,0 +1,519 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    /* Premium UI Tweaks */
+    .dashboard-header {
+        background: linear-gradient(135deg, #4c1d95, #7c3aed);
+        color: white;
+        border-radius: 12px;
+        padding: 20px 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+    }
+    .stat-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: white;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    .chart-box {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        margin-bottom: 25px;
+        border: none;
+    }
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        margin-bottom: 25px;
+    }
+    .badge-soft-danger {
+        background-color: #fee2e2;
+        color: #ef4444;
+    }
+    .badge-soft-warning {
+        background-color: #fef3c7;
+        color: #f59e0b;
+    }
+    .badge-soft-success {
+        background-color: #d1fae5;
+        color: #10b981;
+    }
+    canvas {
+        max-height: 300px;
+    }
+</style>
+
+<div class="container-fluid pb-5">
+
+    <!-- HEADER -->
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-0">Overview Dashboard</h2>
+            <p class="mb-0 opacity-75">Welcome back! Here's what's happening today.</p>
+        </div>
+        <div class="d-flex gap-3 text-center">
+            <div>
+                <h4 class="mb-0 fw-bold">{{ total_products }}</h4>
+                <small class="opacity-75">Products</small>
+            </div>
+            <div class="border-start border-light opacity-50 mx-3"></div>
+            <div>
+                <h4 class="mb-0 fw-bold">{{ total_variants }}</h4>
+                <small class="opacity-75">Variants</small>
+            </div>
+            <div class="border-start border-light opacity-50 mx-3"></div>
+            <div>
+                <h4 class="mb-0 fw-bold">{{ total_suppliers }}</h4>
+                <small class="opacity-75">Suppliers</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALERT CARDS -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card p-4">
+                <div class="stat-icon" style="background: #fef3c7; color: #f59e0b;">⚠️</div>
+                <h6 class="text-muted fw-bold mb-1">Low Stock</h6>
+                <h3 class="fw-bold text-dark mb-0">{{ low_stock_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card p-4">
+                <div class="stat-icon" style="background: #fee2e2; color: #ef4444;">🚨</div>
+                <h6 class="text-muted fw-bold mb-1">Out of Stock</h6>
+                <h3 class="fw-bold text-dark mb-0">{{ out_of_stock_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card p-4">
+                <div class="stat-icon" style="background: #f3f4f6; color: #6b7280;">💤</div>
+                <h6 class="text-muted fw-bold mb-1">Dead Stock</h6>
+                <h3 class="fw-bold text-dark mb-0">{{ dead_stock_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card p-4">
+                <div class="stat-icon" style="background: #e0e7ff; color: #4f46e5;">📦</div>
+                <h6 class="text-muted fw-bold mb-1">Reorder Alerts</h6>
+                <h3 class="fw-bold text-dark mb-0">{{ reorder_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW 1 -->
+    <div class="row">
+        <!-- SALES TREND -->
+        <div class="col-md-8">
+            <div class="chart-box">
+                <h5 class="fw-semibold mb-4 text-dark">Sales & Profit Trend (Last 7 Days)</h5>
+                <canvas id="salesTrendChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- INVENTORY HEALTH -->
+        <div class="col-md-4">
+            <div class="chart-box">
+                <h5 class="fw-semibold mb-4 text-dark">Inventory Health</h5>
+                <canvas id="inventoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW 2 -->
+    <div class="row">
+        <!-- TOP PROFITABLE -->
+        <div class="col-md-4">
+            <div class="chart-box">
+                <h5 class="fw-semibold mb-4 text-dark">Most Profitable Items</h5>
+                <canvas id="profitableChart"></canvas>
+            </div>
+        </div>
+
+        <!-- FAST MOVING -->
+        <div class="col-md-4">
+            <div class="chart-box">
+                <h5 class="fw-semibold mb-4 text-dark">Fast Moving Products</h5>
+                <canvas id="fastMovingChart"></canvas>
+            </div>
+        </div>
+
+        <!-- STORE PERFORMANCE -->
+        <div class="col-md-4">
+            <div class="chart-box">
+                <h5 class="fw-semibold mb-4 text-dark">Store Performance</h5>
+                <canvas id="storeProfitsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLES ROW -->
+    <div class="row">
+        <!-- LOW STOCK TABLE -->
+        <div class="col-md-6">
+            <div class="table-container h-100">
+                <h5 class="fw-semibold mb-4 text-dark">Urgent: Low Stock Items</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Variant</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_stock_items|slice:":5" %}
+                            <tr>
+                                <td class="fw-medium">{{ item.variant.product.name }}</td>
+                                <td>{{ item.variant.size }} | {{ item.variant.color }}</td>
+                                <td><span class="badge badge-soft-danger px-2 py-1 rounded-pill">{{ item.quantity_available }} Left</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-muted text-center py-3">All stock levels are healthy! 🎉</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SMART REORDER TABLE -->
+        <div class="col-md-6">
+            <div class="table-container h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-semibold mb-0 text-dark">Smart Reorder Recommendations</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Variant</th>
+                                <th>Stock</th>
+                                <th>Time Left</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in reorder_alerts|slice:":5" %}
+                            <tr>
+                                <td class="fw-medium">{{ item.product }}</td>
+                                <td class="fw-small">{{ item.variant }}</td>
+                                <td>{{ item.stock_left }}</td>
+                                <td><span class="badge badge-soft-warning px-2 py-1 rounded-pill fw-bold">{{ item.weeks_left }} weeks</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-muted text-center py-3">No reorder alerts at the moment.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLOW MOVING PRODUCTS -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="table-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h5 class="fw-semibold mb-1 text-dark">🐢 Slow Moving Products</h5>
+                        <p class="text-muted mb-0" style="font-size:0.82rem;">These products have the lowest sales — consider running promotions or bundling them.</p>
+                    </div>
+                    <span class="badge rounded-pill px-3 py-2" style="background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; font-size:0.8rem;">Needs Attention ⚠️</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>Total Sold</th>
+                                <th>Suggestion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in slow_moving_products %}
+                            <tr>
+                                <td class="text-muted">{{ forloop.counter }}</td>
+                                <td class="fw-medium">{{ item.variant__product__name }}</td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-1" style="background:#fee2e2; color:#dc2626;">
+                                        Only {{ item.total_sold }} sold
+                                    </span>
+                                </td>
+                                <td class="text-muted" style="font-size:0.82rem;">
+                                    💡 Consider a discount, bundle, or promotional campaign
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    🎉 All products are selling well!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MULTI-STORE INSIGHTS -->
+    <div class="row mt-4">
+
+        <!-- TOP STORE OVERALL -->
+        <div class="col-md-6">
+            <div class="table-container">
+                <h5 class="fw-semibold mb-4 text-dark">🏆 Top Performing Store</h5>
+                {% if top_store %}
+                <div class="d-flex align-items-center gap-3 p-3"
+                     style="background:#f5f3ff; border-radius:12px; border:1px solid #ede9fe;">
+                    <span style="font-size:2.5rem;">🥇</span>
+                    <div>
+                        <div class="fw-bold" style="color:#4c1d95; font-size:1.1rem;">
+                            {{ top_store.sale__store__store_name }}
+                        </div>
+                        <div class="text-muted mt-1" style="font-size:0.85rem;">
+                            Total Profit: <strong class="text-success">₹{{ top_store.total_profit }}</strong>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted">No data available yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- BEST STORE THIS WEEK -->
+        <div class="col-md-6">
+            <div class="table-container">
+                <h5 class="fw-semibold mb-4 text-dark">🔥 Best Store This Week</h5>
+                {% if best_store_week %}
+                <div class="d-flex align-items-center gap-3 p-3"
+                     style="background:#fff7ed; border-radius:12px; border:1px solid #fed7aa;">
+                    <span style="font-size:2.5rem;">⚡</span>
+                    <div>
+                        <div class="fw-bold" style="color:#c2410c; font-size:1.1rem;">
+                            {{ best_store_week.sale__store__store_name }}
+                        </div>
+                        <div class="text-muted mt-1" style="font-size:0.85rem;">
+                            This Week's Profit: <strong class="text-success">₹{{ best_store_week.total_profit }}</strong>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-muted text-center py-3">
+                    <span style="font-size:1.5rem;">📅</span><br>
+                    No sales recorded this week yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHART.JS SCRIPTS -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // Helper for colors
+        const colors = {
+            purple: '#7c3aed',
+            purpleLight: 'rgba(124, 58, 237, 0.2)',
+            indigo: '#4f46e5',
+            emerald: '#10b981',
+            emeraldLight: 'rgba(16, 185, 129, 0.1)',
+            yellow: '#f59e0b',
+            rose: '#ef4444',
+            gray: '#9ca3af',
+        };
+
+        Chart.defaults.font.family = "'Poppins', sans-serif";
+        Chart.defaults.color = '#6b7280';
+
+        // 1. Sales Trend Chart
+        const trendDataRaw = '{{ chart_sales_trend|escapejs }}';
+        if (trendDataRaw && trendDataRaw !== '{}' && trendDataRaw !== 'null') {
+            const data = JSON.parse(trendDataRaw);
+            new Chart(document.getElementById('salesTrendChart'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: data.revenue,
+                            borderColor: colors.purple,
+                            backgroundColor: colors.purpleLight,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: colors.purple
+                        },
+                        {
+                            label: 'Profit',
+                            data: data.profit,
+                            borderColor: colors.emerald,
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: colors.emerald
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } } 
+                    },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 2. Inventory Health Chart
+        const invDataRaw = '{{ chart_inventory|escapejs }}';
+        if (invDataRaw && invDataRaw !== '{}' && invDataRaw !== 'null') {
+            const data = JSON.parse(invDataRaw);
+            new Chart(document.getElementById('inventoryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: [colors.emerald, colors.yellow, colors.rose],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    cutout: '75%',
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } }
+                }
+            });
+        }
+
+        // 3. Profitable Products
+        const profDataRaw = '{{ chart_profitable|escapejs }}';
+        if (profDataRaw && profDataRaw !== '{}' && profDataRaw !== 'null') {
+            const data = JSON.parse(profDataRaw);
+            new Chart(document.getElementById('profitableChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } } }
+                }
+            });
+        }
+
+        // 4. Fast Moving Chart (Bar)
+        const fastDataRaw = '{{ chart_fast_moving|escapejs }}';
+        if (fastDataRaw && fastDataRaw !== '{}' && fastDataRaw !== 'null') {
+            const data = JSON.parse(fastDataRaw);
+            new Chart(document.getElementById('fastMovingChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: data.data,
+                        backgroundColor: colors.emerald,
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // 5. Store Profits Chart
+        const storeDataRaw = '{{ chart_store_profits|escapejs }}';
+        if (storeDataRaw && storeDataRaw !== '{}' && storeDataRaw !== 'null') {
+            const data = JSON.parse(storeDataRaw);
+            new Chart(document.getElementById('storeProfitsChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Profit',
+                        data: data.data,
+                        backgroundColor: colors.indigo,
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Horizontal bar chart
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { beginAtZero: true, grid: { borderDash: [4, 4] } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

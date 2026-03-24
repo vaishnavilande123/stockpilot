@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}StockPilot{% endblock %}</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #cbd5e1; /* Professional Slate Gray for better projector contrast */
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: linear-gradient(90deg, #4c1d95, #7c3aed);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: white !important;
+            margin-left: 10px;
+        }
+
+        .nav-link:hover {
+            color: #ddd6fe !important;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 2px solid white;
+        }
+
+        /* Cards */
+        .card {
+            border-radius: 14px;
+            border: none;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #7c3aed;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #6d28d9;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        /* ========================= */
+        /* GLOBAL FORM STYLES        */
+        /* ========================= */
+
+        /* Style all inputs, selects, textareas inside forms */
+        form input,
+        form select,
+        form textarea {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.85rem;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            color: #1e1b4b;
+            background-color: #f8f7ff;
+            border: 1px solid #c4b5fd;
+            border-radius: 8px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        form input:focus,
+        form select:focus,
+        form textarea:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+            background-color: #ffffff;
+        }
+
+        /* Labels */
+        form label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #4c1d95;
+            margin-bottom: 5px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Paragraph wrapper from form.as_p */
+        form p {
+            margin-bottom: 1rem;
+        }
+
+        /* Validation error list */
+        form ul.errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 4px 0 0;
+        }
+
+        form ul.errorlist li {
+            font-size: 0.8rem;
+            color: #dc2626;
+        }
+
+        /* File input fix */
+        form input[type="file"] {
+            padding: 0.35rem 0.6rem;
+            background: white;
+        }
+
+        /* Fix radio/checkbox - don't apply block/full-width to these */
+        form input[type="radio"],
+        form input[type="checkbox"] {
+            display: inline-block;
+            width: auto;
+            padding: 0;
+            border: none;
+            background: none;
+            box-shadow: none;
+            border-radius: 0;
+            accent-color: #7c3aed;
+        }
+
+        /* Form card styling */
+        .form-card {
+            background: white;
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(76, 29, 149, 0.1);
+        }
+
+        .form-card .card-body {
+            padding: 2rem;
+        }
+
+        .form-card h4 {
+            color: #4c1d95;
+            font-weight: 700;
+            border-bottom: 2px solid #ede9fe;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+
+        /* ========================= */
+        /* LIST PAGE STYLES          */
+        /* ========================= */
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .list-header h2 {
+            font-weight: 700;
+            color: #1e1b4b;
+            margin: 0;
+        }
+
+        .list-card {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(76, 29, 149, 0.08);
+            overflow: hidden;
+        }
+
+        .list-card .table {
+            margin: 0;
+        }
+
+        .list-card .table thead th {
+            background: linear-gradient(90deg, #4c1d95, #6d28d9);
+            color: white;
+            font-weight: 600;
+            font-size: 0.82rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: none;
+            padding: 14px 16px;
+        }
+
+        .list-card .table tbody tr {
+            transition: background 0.15s;
+        }
+
+        .list-card .table tbody tr:hover {
+            background-color: #f5f3ff;
+        }
+
+        .list-card .table tbody td {
+            vertical-align: middle;
+            padding: 12px 16px;
+            border-color: #ede9fe;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        /* ========================= */
+        /* DELETE CONFIRM STYLES     */
+        /* ========================= */
+
+        .delete-card {
+            background: white;
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.1);
+        }
+
+        .delete-card .delete-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+        }
+
+        /* ========================= */
+        /* SELECT STORE STYLES       */
+        /* ========================= */
+
+        .store-option {
+            background: white;
+            border: 2px solid #ede9fe;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .store-option:hover {
+            border-color: #7c3aed;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
+        }
+
+        .store-option label {
+            font-weight: 600;
+            color: #1e1b4b;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .store-option .store-location {
+            font-size: 0.8rem;
+            color: #6b7280;
+            display: block;
+            margin-top: 2px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- ========================= -->
+<!-- NAVBAR -->
+<!-- ========================= -->
+{% if user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container-fluid">
+
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'dashboard' %}">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span style="font-weight: 700; letter-spacing: 0.5px; background: linear-gradient(90deg, #f8fafc, #bae6fd); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">StockPilot</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <!-- LEFT -->
+            <ul class="navbar-nav">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'category_list' %}">Categories</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'product_list' %}">Products</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'product_variant_list' %}">Variants</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'supplier_list' %}">Suppliers</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'purchase_list' %}">Purchases</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'sale_list' %}">Sales</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'inventory_list' %}">Inventory</a>
+                </li>
+
+            </ul>
+
+            <!-- RIGHT -->
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                {% if request.session.store_name %}
+                <li class="nav-item me-3">
+                    <span class="text-white small">
+                        🏪{{ request.session.store_name }}
+                    </span>
+                </li>
+                {% endif %}
+
+                <li class="nav-item me-3">
+                    <span class="text-white small">
+                        👤{{ user.username }}
+                    </span>
+                </li>
+
+                <!-- SAFE LOGOUT -->
+                <li class="nav-item">
+                    <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-light btn-sm">Logout</button>
+                    </form>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+</nav>
+{% endif %}
+
+<!-- ========================= -->
+<!-- MESSAGES -->
+<!-- ========================= -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- ========================= -->
+<!-- PAGE CONTENT -->
+<!-- ========================= -->
+<div class="container mt-4">
+
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- AUTO DISMISS -->
+<script>
+setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(el => el.remove());
+}, 3000);
+</script>
+
+</body>
+</html>

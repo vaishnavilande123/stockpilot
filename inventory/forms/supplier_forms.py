@@ -5,7 +5,6 @@ class SupplierForm(ModelForm):
   class Meta:
     model = Supplier
     fields = [
-            'store',
             'supplier_name',
             'phone',
             'email',
